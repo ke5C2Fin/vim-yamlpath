@@ -1,2 +1,2 @@
 # vim-yamlpath
-Show YAML Path in Vim
+An extremely nieve YAML parser to display the YAML path in Vim
