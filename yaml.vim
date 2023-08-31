@@ -8,11 +8,10 @@ function! GetYamlPath(line)
 	let curr_indent = indent(lnum)
 	if curr_line =~# '^\s*-\s'
 		let islist = 1
-		let curr_line = substitute(curr_line, '-', ' ', '')
 		let curr_indent += 2
 	endif
 	let trig_indent = curr_indent
-	let yaml_key = matchstr(curr_line, '^\s*\zs[^:]\+\ze:')
+	let yaml_key = matchstr(curr_line, '^\s*-\?\s*\zs[^:]\+\ze:')
 	if yaml_key =~# '\.'
 		let yaml_key = '"' .. yaml_key .. '"'
 	endif
@@ -29,14 +28,13 @@ function! GetYamlPath(line)
 		let curr_indent = indent(lnum)
 		if curr_line =~# '^\s*-\s'
 			let islist = 1
-			let curr_line = substitute(curr_line, '-', ' ', '')
 			let curr_indent += 2
 		endif
 		if curr_indent >= trig_indent
 			continue
 		endif
 		let trig_indent = curr_indent
-		let yaml_key = matchstr(curr_line, '^\s*\zs[^:]\+\ze:')
+		let yaml_key = matchstr(curr_line, '^\s*-\?\s*\zs[^:]\+\ze:')
 		if yaml_key =~# '\.'
 			let yaml_key = '"' .. yaml_key .. '"'
 		endif
