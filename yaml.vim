@@ -30,7 +30,7 @@ function! GetYamlPath(line)
 		endif
 		let trig_indent = curr_indent
 
-		let yaml_key = matchstr(curr_line, '^\s*-\?\s*\zs[^:]\+\ze:')
+		let yaml_key = matchstr(curr_line, '^\s*-\?\s*\zs\S\{-}\ze:')
 		if yaml_key =~# '\.'
 			let yaml_key = '"' .. yaml_key .. '"'
 		endif
