@@ -11,15 +11,19 @@ function! GetYamlPath(line)
 	endif
 
 	while curr_indent != 0 || islist || lnum == a:line
+		let curr_line = getline(lnum)
+		let curr_indent = indent(lnum)
+		let lnum -= 1
+
+		if curr_line =~# '^\s*#'
+			continue
+		endif
+
 		let list_indicator = ''
 		if islist
 			let list_indicator = '[]'
 		endif
 		let islist = 0
-
-		let curr_line = getline(lnum)
-		let curr_indent = indent(lnum)
-		let lnum -= 1
 
 		if curr_line =~# '^\s*-\s'
 			let islist = 1
