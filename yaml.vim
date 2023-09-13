@@ -1,21 +1,33 @@
 function! GetYamlPath(line)
 	let lnum = a:line
-	let curr_indent = indent(lnum)
-	let trig_indent = curr_indent
-	let yaml_path = ''
-	let separator = ''
-	let islist = 0
 
-	if getline(a:line) =~# '^\s*#'
+	let curr_line = getline(lnum)
+	if curr_line =~# '^\s*\(#.*\)\?$' " comments and blank lines
 		return ''
 	endif
 
-	while curr_indent != 0 || islist || lnum == a:line
-		let curr_line = getline(lnum)
-		let curr_indent = indent(lnum)
-		let lnum -= 1
+	let islist = 0
+	let curr_indent = indent(lnum)
+	if curr_line =~# '^\s*-\s'
+		let islist = 1
+		let curr_indent += 2
+	endif
+	let trig_indent = curr_indent
 
-		if curr_line =~# '^\s*#'
+	let yaml_key = matchstr(curr_line, '^\s*-\?\s*\zs\S\{-}\ze:') " non-greedy
+	if yaml_key =~# '\.'
+		let yaml_key = '"' .. yaml_key .. '"'
+	endif
+	let yaml_path = yaml_key
+
+	while curr_indent > 0
+		let lnum -= 1
+		if lnum == 0
+			return ''
+		endif
+
+		let curr_line = getline(lnum)
+		if curr_line =~# '^\s*\(#.*\)\?$' " comments and blank lines
 			continue
 		endif
 
@@ -25,21 +37,21 @@ function! GetYamlPath(line)
 		endif
 		let islist = 0
 
+		let curr_indent = indent(lnum)
 		if curr_line =~# '^\s*-\s'
 			let islist = 1
-			let curr_indent += 2 " assumes only '\s*- foo' and not '\s*- \+foo'
+			let curr_indent += 2
 		endif
-		if curr_indent >= trig_indent && lnum + 1 != a:line
+		if curr_indent >= trig_indent
 			continue
 		endif
 		let trig_indent = curr_indent
 
-		let yaml_key = matchstr(curr_line, '^\s*-\?\s*\zs\S\{-}\ze:')
+		let yaml_key = matchstr(curr_line, '^\s*-\?\s*\zs\S\{-}\ze:') " non-greedy
 		if yaml_key =~# '\.'
 			let yaml_key = '"' .. yaml_key .. '"'
 		endif
-		let yaml_path = yaml_key .. list_indicator .. separator .. yaml_path
-		let separator = '.'
+		let yaml_path = yaml_key .. list_indicator .. '.' .. yaml_path
 	endwhile
 
 	return yaml_path
