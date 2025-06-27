@@ -2,19 +2,19 @@ function! GetYamlPath(line)
 	let lnum = a:line
 
 	let curr_line = getline(lnum)
-	if curr_line =~# '^\s*\(#.*\)\?$' " comments and blank lines
+	if curr_line =~# '^ *\(#.*\)\?$' " comments and blank lines
 		return ''
 	endif
 
 	let islist = 0
 	let curr_indent = indent(lnum)
-	if curr_line =~# '^\s*-\s'
+	if curr_line =~# '^ *- '
 		let islist = 1
 		let curr_indent += 2
 	endif
 	let trig_indent = curr_indent
 
-	let yaml_key = matchstr(curr_line, '^\s*-\?\s*\zs\S\{-}\ze:') " non-greedy
+	let yaml_key = matchstr(curr_line, '^ *-\? *\zs\S\{-}\ze:') " non-greedy
 	if yaml_key =~# '\.'
 		let yaml_key = '"' .. yaml_key .. '"'
 	endif
@@ -27,7 +27,7 @@ function! GetYamlPath(line)
 		endif
 
 		let curr_line = getline(lnum)
-		if curr_line =~# '^\s*\(#.*\)\?$' " comments and blank lines
+		if curr_line =~# '^ *\(#.*\)\?$' " comments and blank lines
 			continue
 		endif
 
@@ -38,7 +38,7 @@ function! GetYamlPath(line)
 		let islist = 0
 
 		let curr_indent = indent(lnum)
-		if curr_line =~# '^\s*-\s'
+		if curr_line =~# '^ *- '
 			let islist = 1
 			let curr_indent += 2
 		endif
@@ -47,7 +47,7 @@ function! GetYamlPath(line)
 		endif
 		let trig_indent = curr_indent
 
-		let yaml_key = matchstr(curr_line, '^\s*-\?\s*\zs\S\{-}\ze:') " non-greedy
+		let yaml_key = matchstr(curr_line, '^ *-\? *\zs\S\{-}\ze:') " non-greedy
 		if yaml_key =~# '\.'
 			let yaml_key = '"' .. yaml_key .. '"'
 		endif
