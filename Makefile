@@ -1,13 +1,14 @@
-T := yaml
+T := yaml.vim
 DIR := $(realpath .)
+TDIR := ~/.vim/ftplugin
 
 all: vim
 
 vim: $(T).vim
-	mkdir -p ~/.vim/plugin
-	ln -s $(DIR)/$(T).vim ~/.vim/plugin/$(T).vim
+	mkdir -p $(TDIR)
+	ln -s $(DIR)/$(T) $(TDIR)/$(T)
 
 clean:
-	rm -f ~/.vim/plugin/$(T).vim
+	rm -f $(TDIR)/$(T)
 
 .PHONY: all vim clean
