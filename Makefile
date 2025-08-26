@@ -4,7 +4,7 @@ TDIR := ~/.vim/ftplugin
 
 all: vim
 
-vim: $(T).vim
+vim: $(T)
 	mkdir -p $(TDIR)
 	ln -s $(DIR)/$(T) $(TDIR)/$(T)
 
