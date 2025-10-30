@@ -1,65 +1,63 @@
-function! GetYamlPath(line)
-	let lnum = a:line
+" TODO > >- | |- logic
+"
+function! s:CheckLine(line)
+        return a:line =~# '^ *\(#.*\)\?$' " comments and blank lines
+endfunction
 
-	let curr_line = getline(lnum)
-	if curr_line =~# '^ *\(#.*\)\?$' " comments and blank lines
-		return ''
-	endif
+function! s:IsSequence(line)
+        return a:line =~# '^ *- '
+endfunction
 
-	let islist = 0
-	let curr_indent = indent(lnum)
-	if curr_line =~# '^ *- '
-		let islist = 1
-		let curr_indent += 2
-	endif
-	let trig_indent = curr_indent
+function! s:GetIndent(lnum, is_seq)
+        let l:indent = indent(a:lnum)
+        if a:is_seq
+                let l:indent += 2
+        endif
+        return l:indent
+endfunction
 
-	let yaml_key = matchstr(curr_line, '^ *-\? *\zs\S\{-}\ze:') " non-greedy
-	if yaml_key =~# '\.'
-		let yaml_key = '"' .. yaml_key .. '"'
-	endif
-	let yaml_path = yaml_key
+function! s:GetYamlKey(line)
+        let l:key = matchstr(a:line, '^ *-\? *\zs\S\{-}\ze:') " non-greedy
+        if l:key =~# '\.'
+                let l:key = '"' . l:key . '"'
+        endif
+        return l:key
+endfunction
 
-	while curr_indent > 0
-		let lnum -= 1
-		if lnum == 0
-			return ''
-		endif
-
-		let curr_line = getline(lnum)
-		if curr_line =~# '^ *\(#.*\)\?$' " comments and blank lines
-			continue
-		endif
-
-		let list_indicator = ''
-		if islist
-			let list_indicator = '[]'
-		endif
-		let islist = 0
-
-		let curr_indent = indent(lnum)
-		if curr_line =~# '^ *- '
-			let islist = 1
-			let curr_indent += 2
-		endif
-		if curr_indent >= trig_indent
-			continue
-		endif
-		let trig_indent = curr_indent
-
-		let yaml_key = matchstr(curr_line, '^ *-\? *\zs\S\{-}\ze:') " non-greedy
-		if yaml_key =~# '\.'
-			let yaml_key = '"' .. yaml_key .. '"'
-		endif
-		let yaml_path = yaml_key .. list_indicator .. '.' .. yaml_path
-	endwhile
-
-	return yaml_path
+function! s:GetYamlPath(line)
+        let l:lnum = a:line
+        let l:line = getline(l:lnum)
+        if s:CheckLine(l:line)
+                return ''
+        endif
+        let l:is_seq = s:IsSequence(l:line)
+        let l:curr_indent = s:GetIndent(l:lnum, l:is_seq)
+        let l:trig_indent = l:curr_indent
+        let l:yaml_path = s:GetYamlKey(l:line)
+        while l:curr_indent > 0
+                let l:lnum -= 1
+                if l:lnum <= 0
+                        break
+                endif
+                let l:line = getline(l:lnum)
+                if s:CheckLine(l:line)
+                        continue
+                endif
+                let l:is_seq = s:IsSequence(l:line)
+                let l:curr_indent = s:GetIndent(l:lnum, l:is_seq)
+                if l:curr_indent >= l:trig_indent
+                        continue
+                endif
+                let l:trig_indent = l:curr_indent
+                let l:seq_indicator = l:is_seq ? '[]' : ''
+                let l:yaml_path = s:GetYamlKey(l:line) . l:seq_indicator . '.' . l:yaml_path
+        endwhile
+        return l:yaml_path
 endfunction
 
 augroup YamlPath
-	au!
-	if &filetype =~# 'yaml'
-		autocmd CursorMoved <buffer> redraw | echo GetYamlPath(line('.'))
-	endif
-aug END
+        autocmd!
+        if &filetype =~# 'yaml'
+                autocmd CursorMoved <buffer> redraw | echomsg(s:GetYamlPath(line('.')))
+        endif
+augroup END
