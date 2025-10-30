@@ -25,15 +25,16 @@ function! s:GetYamlKey(line)
 endfunction
 
 function! s:GetYamlPath(line)
-        let l:lnum = a:line
-        let l:line = getline(l:lnum)
+        let l:line = getline(a:line)
         if s:CheckLine(l:line)
                 return ''
         endif
         let l:is_seq = s:IsSequence(l:line)
-        let l:curr_indent = s:GetIndent(l:lnum, l:is_seq)
+        let l:curr_indent = s:GetIndent(a:line, l:is_seq)
         let l:trig_indent = l:curr_indent
         let l:yaml_path = s:GetYamlKey(l:line)
+
+        let l:lnum = a:line
         while l:curr_indent > 0
                 let l:lnum -= 1
                 if l:lnum <= 0
