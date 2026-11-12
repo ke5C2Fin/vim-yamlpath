@@ -57,8 +57,6 @@ function! s:GetYamlPath(line)
 endfunction
 
 augroup YamlPath
-        autocmd!
-        if &filetype =~# 'yaml'
-                autocmd CursorMoved <buffer> redraw | echomsg(s:GetYamlPath(line('.')))
-        endif
+        autocmd! * <buffer>
+        autocmd CursorMoved <buffer> redraw | echo(s:GetYamlPath(line('.')))
 augroup END
