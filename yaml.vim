@@ -17,6 +17,10 @@ function! s:GetIndent(lnum, is_seq)
 endfunction
 
 function! s:GetYamlKey(line)
+        let l:key = matchstr(a:line, '^ *\%(- *\)\?\zs\(["'']\).\{-}\1\ze *:')"
+        if l:key !=# ''
+                return l:key
+        endif
         let l:key = matchstr(a:line, '^ *-\? *\zs\S\{-}\ze:') " non-greedy
         if l:key =~# '\.'
                 let l:key = '"' . l:key . '"'
