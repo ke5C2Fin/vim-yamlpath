@@ -1,7 +1,7 @@
 " TODO > >- | |- logic
 "
 function! s:CheckLine(line)
-        return a:line =~# '^ *\%\(#.*\)\?$' " comments and blank lines
+        return a:line =~# '\v^ *%(#.*)?$' " comments and blank lines
 endfunction
 
 function! s:IsSequence(line)
@@ -17,11 +17,11 @@ function! s:GetIndent(lnum, is_seq)
 endfunction
 
 function! s:GetYamlKey(line)
-        let l:key = matchstr(a:line, '^ *-\? *\zs\(["'']\).\{-}\1\ze *:')
+        let l:key = matchstr(a:line, '\v^ *-? *\zs(["'']).{-}\1\ze *:')
         if l:key !=# ''
                 return l:key
         endif
-        let l:key = matchstr(a:line, '^ *-\? *\zs\S\{-}\ze:\%\(\s|\$\)')
+        let l:key = matchstr(a:line, '\v^ *-? *\zs\S{-}\ze:%(\s|$)')
         if l:key =~# '\.'
                 let l:key = '"' . l:key . '"'
         endif
