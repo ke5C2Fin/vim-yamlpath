@@ -1,7 +1,7 @@
 " TODO > >- | |- logic
 "
 function! s:CheckLine(line)
-        return a:line =~# '^ *\(#.*\)\?$' " comments and blank lines
+        return a:line =~# '^ *\%\(#.*\)\?$' " comments and blank lines
 endfunction
 
 function! s:IsSequence(line)
