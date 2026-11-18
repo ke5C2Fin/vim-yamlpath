@@ -21,7 +21,7 @@ function! s:GetYamlKey(line)
         if l:key !=# ''
                 return l:key
         endif
-        let l:key = matchstr(a:line, '^ *-\? *\zs\S\{-}\ze:') " non-greedy
+        let l:key = matchstr(a:line, '^ *-\? *\zs\S\{-}\ze:\%\(\s|\$\)')
         if l:key =~# '\.'
                 let l:key = '"' . l:key . '"'
         endif
